@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=healthcare_db
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+  web:
+    build: .
+    command: >
+      bash -c "python manage.py makemigrations core &&
+               python manage.py migrate &&
+               python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgres://user:pass@db:5432/healthcare_db
+    depends_on:
+      - db
+volumes:
+  postgres_data:
