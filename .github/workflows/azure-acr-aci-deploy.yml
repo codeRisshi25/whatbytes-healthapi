@@ -2,7 +2,7 @@ name: Build and Deploy to ACR + ACI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-deploy-aci:
@@ -19,13 +19,22 @@ jobs:
       - name: ACR login
         run: az acr login --name ${{ secrets.ACR_NAME }}
 
-      - name: Build and push image to ACR
-        env:
-          ACR_NAME: ${{ secrets.ACR_NAME }}
-          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+      - name: Validate secrets
         run: |
-          docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:latest .
-          docker push $ACR_NAME.azurecr.io/$IMAGE_NAME:latest
+          if [ -z "${{ secrets.IMAGE_NAME }}" ]; then
+            echo "ERROR: IMAGE_NAME secret is not set. Go to GitHub repo Settings > Secrets and variables > Actions > New repository secret"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ACR_NAME }}" ]; then
+            echo "ERROR: ACR_NAME secret is not set"
+            exit 1
+          fi
+          echo "IMAGE_NAME=${{ secrets.IMAGE_NAME }}" >> $GITHUB_ENV
+
+      - name: Build and push image to ACR
+        run: |
+          docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:latest .
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/${{ secrets.IMAGE_NAME }}:latest
 
       - name: Get ACR credentials
         id: acrcreds
@@ -35,7 +44,22 @@ jobs:
           # pick the first password
           echo "ACR_PASSWORD=$(echo $CREDS | jq -r .passwords[0].value)" >> $GITHUB_OUTPUT
 
-      - name: Deploy or update Azure Container Instance
+      - name: Validate deployment secrets
+        run: |
+          if [ -z "${{ secrets.AZURE_RESOURCE_GROUP }}" ]; then
+            echo "ERROR: AZURE_RESOURCE_GROUP secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ACI_NAME }}" ]; then
+            echo "ERROR: ACI_NAME secret is not set"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ACI_DNS_NAME }}" ]; then
+            echo "ERROR: ACI_DNS_NAME secret is not set"
+            exit 1
+          fi
+
+      - name: Deploy or update Azure Container Instance (multi-container)
         env:
           RG: ${{ secrets.AZURE_RESOURCE_GROUP }}
           ACI_NAME: ${{ secrets.ACI_NAME }}
@@ -47,6 +71,66 @@ jobs:
         run: |
           ACR_LOGIN=${ACR_NAME}.azurecr.io
           IMAGE=${ACR_LOGIN}/${IMAGE_NAME}:latest
+          echo "Deploying to $ACI_DNS.centralindia.azurecontainer.io"
+
+          # Create YAML for multi-container deployment
+          cat > /tmp/aci-deploy.yaml << EOF
+          location: centralindia
+          name: $ACI_NAME
+          properties:
+            containers:
+            - name: web
+              properties:
+                image: $IMAGE
+                ports:
+                - port: 8000
+                resources:
+                  requests:
+                    cpu: 1.0
+                    memoryInGB: 1.0
+                environmentVariables:
+                - name: DATABASE_URL
+                  value: postgres://user:pass@localhost:5432/healthcare_db
+                - name: SECRET_KEY
+                  value: "${{ secrets.SECRET_KEY }}"
+                - name: ALLOWED_HOSTS
+                  value: "${{ secrets.ALLOWED_HOSTS }}"
+                - name: DEBUG
+                  value: "False"
+                command:
+                  - /bin/bash
+                  - -c
+                  - |
+                    python manage.py migrate --noinput
+                    gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+            - name: db
+              properties:
+                image: postgres:15
+                ports:
+                - port: 5432
+                resources:
+                  requests:
+                    cpu: 0.5
+                    memoryInGB: 1.0
+                environmentVariables:
+                - name: POSTGRES_DB
+                  value: healthcare_db
+                - name: POSTGRES_USER
+                  value: user
+                - name: POSTGRES_PASSWORD
+                  value: pass
+            osType: Linux
+            ipAddress:
+              type: Public
+              ports:
+              - protocol: TCP
+                port: 8000
+              dnsNameLabel: $ACI_DNS
+            imageRegistryCredentials:
+            - server: $ACR_LOGIN
+              username: $ACR_USERNAME
+              password: "$ACR_PASSWORD"
+          EOF
 
           # delete existing container instance if exists
           set +e
@@ -56,17 +140,5 @@ jobs:
           fi
           set -e
 
-          az container create \
-            --resource-group $RG \
-            --name $ACI_NAME \
-            --image $IMAGE \
-            --dns-name-label $ACI_DNS \
-            --ports 8000 \
-            --registry-login-server $ACR_LOGIN \
-            --registry-username $ACR_USERNAME \
-            --registry-password "$ACR_PASSWORD" \
-            --environment-variables \
-              SECRET_KEY="${{ secrets.SECRET_KEY }}" \
-              DATABASE_URL="${{ secrets.DATABASE_URL }}" \
-              DEBUG="False" \
-              ALLOWED_HOSTS="${{ secrets.ALLOWED_HOSTS }}"
+          # Create multi-container deployment
+          az container create -g $RG --file /tmp/aci-deploy.yaml

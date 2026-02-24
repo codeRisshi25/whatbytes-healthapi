@@ -123,13 +123,22 @@ Note: `GET /api/mappings/<patient_id>/` and `DELETE /api/mappings/<id>/` share t
 
 ## Deploy to Azure
 
-This repo includes a GitHub Actions workflow to build and push the container to Azure Container Registry and update an Azure Web App for Containers.
+This repo includes a GitHub Actions workflow to build and push the container to Azure Container Registry and deploy to Azure Container Instances (ACI).
 
-Required GitHub secrets:
+Required GitHub secrets (go to Settings > Secrets and variables > Actions > New repository secret):
+
 - `AZURE_CREDENTIALS` — service principal JSON for `azure/login` action
 - `ACR_NAME` — your Azure Container Registry name (no suffix)
 - `IMAGE_NAME` — image repository name (e.g., `whatbytes-web`)
-- `AZURE_RESOURCE_GROUP` — Azure resource group for the Web App
-- `AZURE_WEBAPP_NAME` — Web App name
+- `AZURE_RESOURCE_GROUP` — Azure resource group for the Container Instance
+- `ACI_NAME` — name for the container instance
+- `ACI_DNS_NAME` — DNS label for the container instance (must be unique per region)
+- `SECRET_KEY` — Django secret key
+- `DATABASE_URL` — PostgreSQL connection string
+- `ALLOWED_HOSTS` — Allowed hosts for Django
 
-Workflow: `.github/workflows/azure-container-deploy.yml` pushes `latest` tag to ACR and updates the Web App to use it. The container runs migrations at startup via `entrypoint.sh`.
+After push to `main` the workflow will build & push the image to ACR and create/update an ACI instance. The public URL will be:
+
+`http://<ACI_DNS_NAME>.<region>.azurecontainer.io:8000/api/docs/`
+
+Use ACI for cheap, quick demos — it's lightweight and suited for temporary assignments. For production, consider App Service or AKS.
