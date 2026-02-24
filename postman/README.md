@@ -7,5 +7,6 @@ Postman Usage
 5. Run patient/doctor/mapping requests using the environment.
 
 Notes:
+
 - Protected endpoints require `Authorization: Bearer {{accessToken}}` header.
 - Replace `:id` and `:patient_id` in request URLs with actual numeric IDs returned from create/list responses.

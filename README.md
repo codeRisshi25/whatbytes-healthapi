@@ -20,9 +20,9 @@ Backend for healthcare management built with Django, Django REST Framework, Post
    - `http://localhost:8000/api/`
    - `http://localhost:8000/api/`
 
-  OpenAPI / Swagger UI:
-  - `http://localhost:8000/api/docs/`
+OpenAPI / Swagger UI:
 
+- `http://localhost:8000/api/docs/`
 
 ## Authentication
 

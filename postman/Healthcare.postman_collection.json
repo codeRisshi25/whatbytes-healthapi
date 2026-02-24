@@ -16,18 +16,32 @@
           "name": "Register",
           "request": {
             "method": "POST",
-            "header": [{"key":"Content-Type","value":"application/json"}],
-            "body": {"mode":"raw","raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"StrongPass123!\"\n}"},
-            "url": {"raw": "{{baseUrl}}/auth/register/","host": ["{{baseUrl}}"],"path":["auth","register",""]}
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"password\": \"StrongPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register", ""]
+            }
           }
         },
         {
           "name": "Login",
           "request": {
             "method": "POST",
-            "header": [{"key":"Content-Type","value":"application/json"}],
-            "body": {"mode":"raw","raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"StrongPass123!\"\n}"},
-            "url": {"raw": "{{baseUrl}}/auth/login/","host": ["{{baseUrl}}"],"path":["auth","login",""]}
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"StrongPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login/",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login", ""]
+            }
           }
         }
       ]
@@ -40,28 +54,80 @@
           "request": {
             "method": "POST",
             "header": [
-              {"key":"Content-Type","value":"application/json"},
-              {"key":"Authorization","value":"Bearer {{accessToken}}"}
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
             ],
-            "body": {"mode":"raw","raw": "{\n  \"name\": \"Alice\",\n  \"age\": 30,\n  \"gender\": \"Female\",\n  \"contact\": \"+1-555-0101\",\n  \"address\": \"New York\",\n  \"medical_history\": \"None\"\n}"},
-            "url": {"raw": "{{baseUrl}}/patients/","host": ["{{baseUrl}}"],"path":["patients",""]}
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alice\",\n  \"age\": 30,\n  \"gender\": \"Female\",\n  \"contact\": \"+1-555-0101\",\n  \"address\": \"New York\",\n  \"medical_history\": \"None\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", ""]
+            }
           }
         },
         {
           "name": "List Patients",
-          "request": {"method": "GET","header":[{"key":"Authorization","value":"Bearer {{accessToken}}"}],"url":{"raw":"{{baseUrl}}/patients/","host":["{{baseUrl}}"],"path":["patients",""]}}
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patients/",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", ""]
+            }
+          }
         },
         {
           "name": "Get Patient",
-          "request": {"method":"GET","header":[{"key":"Authorization","value":"Bearer {{accessToken}}"}],"url":{"raw":"{{baseUrl}}/patients/:id/","host":["{{baseUrl}}"],"path":["patients",":id",""]}}
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patients/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", ":id", ""]
+            }
+          }
         },
         {
           "name": "Update Patient",
-          "request": {"method":"PUT","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{accessToken}}"}],"body":{"mode":"raw","raw":"{\n  \"name\": \"Alice Updated\",\n  \"age\": 31,\n  \"gender\": \"Female\",\n  \"contact\": \"+1-555-0101\",\n  \"address\": \"New York\",\n  \"medical_history\": \"None\"\n}"},"url":{"raw":"{{baseUrl}}/patients/:id/","host":["{{baseUrl}}"],"path":["patients",":id",""]}}
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Alice Updated\",\n  \"age\": 31,\n  \"gender\": \"Female\",\n  \"contact\": \"+1-555-0101\",\n  \"address\": \"New York\",\n  \"medical_history\": \"None\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", ":id", ""]
+            }
+          }
         },
         {
           "name": "Delete Patient",
-          "request": {"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{accessToken}}"}],"url":{"raw":"{{baseUrl}}/patients/:id/","host":["{{baseUrl}}"],"path":["patients",":id",""]}}
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/patients/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", ":id", ""]
+            }
+          }
         }
       ]
     },
@@ -70,21 +136,150 @@
       "item": [
         {
           "name": "Create Doctor",
-          "request": {"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{accessToken}}"}],"body":{"mode":"raw","raw":"{\n  \"name\": \"Dr. Smith\",\n  \"specialization\": \"Cardiology\",\n  \"email\": \"dr.smith@example.com\",\n  \"phone\": \"+1-555-0102\",\n  \"hospital\": \"City Hospital\",\n  \"years_of_experience\": 10\n}"},"url":{"raw":"{{baseUrl}}/doctors/","host":["{{baseUrl}}"],"path":["doctors",""]}}
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dr. Smith\",\n  \"specialization\": \"Cardiology\",\n  \"email\": \"dr.smith@example.com\",\n  \"phone\": \"+1-555-0102\",\n  \"hospital\": \"City Hospital\",\n  \"years_of_experience\": 10\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/doctors/",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctors", ""]
+            }
+          }
         },
-        {"name":"List Doctors","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{accessToken}}"}],"url":{"raw":"{{baseUrl}}/doctors/","host":["{{baseUrl}}"],"path":["doctors",""]}}},
-        {"name":"Get Doctor","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{accessToken}}"}],"url":{"raw":"{{baseUrl}}/doctors/:id/","host":["{{baseUrl}}"],"path":["doctors",":id",""]}}},
-        {"name":"Update Doctor","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{accessToken}}"}],"body":{"mode":"raw","raw":"{\n  \"name\": \"Dr. Updated\",\n  \"specialization\": \"Cardiology\",\n  \"email\": \"dr.smith@example.com\",\n  \"phone\": \"+1-555-0102\"\n}"},"url":{"raw":"{{baseUrl}}/doctors/:id/","host":["{{baseUrl}}"],"path":["doctors",":id",""]}}},
-        {"name":"Delete Doctor","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{accessToken}}"}],"url":{"raw":"{{baseUrl}}/doctors/:id/","host":["{{baseUrl}}"],"path":["doctors",":id",""]}}}
+        {
+          "name": "List Doctors",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/doctors/",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctors", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Doctor",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/doctors/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctors", ":id", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Doctor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dr. Updated\",\n  \"specialization\": \"Cardiology\",\n  \"email\": \"dr.smith@example.com\",\n  \"phone\": \"+1-555-0102\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/doctors/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctors", ":id", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Doctor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/doctors/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["doctors", ":id", ""]
+            }
+          }
+        }
       ]
     },
     {
       "name": "Mappings",
       "item": [
-        {"name":"Create Mapping","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"},{"key":"Authorization","value":"Bearer {{accessToken}}"}],"body":{"mode":"raw","raw":"{\n  \"patient\": 1,\n  \"doctor\": 1\n}"},"url":{"raw":"{{baseUrl}}/mappings/","host":["{{baseUrl}}"],"path":["mappings",""]}}},
-        {"name":"List Mappings","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{accessToken}}"}],"url":{"raw":"{{baseUrl}}/mappings/","host":["{{baseUrl}}"],"path":["mappings",""]}}},
-        {"name":"Get Mappings By Patient","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{accessToken}}"}],"url":{"raw":"{{baseUrl}}/mappings/:patient_id/","host":["{{baseUrl}}"],"path":["mappings",":patient_id",""]}}},
-        {"name":"Delete Mapping","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{accessToken}}"}],"url":{"raw":"{{baseUrl}}/mappings/:id/","host":["{{baseUrl}}"],"path":["mappings",":id",""]}}}
+        {
+          "name": "Create Mapping",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patient\": 1,\n  \"doctor\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/mappings/",
+              "host": ["{{baseUrl}}"],
+              "path": ["mappings", ""]
+            }
+          }
+        },
+        {
+          "name": "List Mappings",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mappings/",
+              "host": ["{{baseUrl}}"],
+              "path": ["mappings", ""]
+            }
+          }
+        },
+        {
+          "name": "Get Mappings By Patient",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mappings/:patient_id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["mappings", ":patient_id", ""]
+            }
+          }
+        },
+        {
+          "name": "Delete Mapping",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/mappings/:id/",
+              "host": ["{{baseUrl}}"],
+              "path": ["mappings", ":id", ""]
+            }
+          }
+        }
       ]
     }
   ]
