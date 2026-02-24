@@ -3,6 +3,7 @@
 Backend for healthcare management built with Django, Django REST Framework, PostgreSQL, and JWT authentication.
 
 ## Tech Stack
+
 - Django
 - Django REST Framework
 - PostgreSQL
@@ -10,6 +11,7 @@ Backend for healthcare management built with Django, Django REST Framework, Post
 - Docker + Docker Compose
 
 ## Setup
+
 1. Copy environment file:
    - `cp .env.example .env`
 2. Start the services:
@@ -18,11 +20,13 @@ Backend for healthcare management built with Django, Django REST Framework, Post
    - `http://localhost:8000/api/`
 
 ## Authentication
+
 Use `Authorization: Bearer <access_token>` for protected endpoints.
 
 ## API Endpoints
 
 ### 1) Authentication
+
 - `POST /api/auth/register/`
   - body:
     ```json
@@ -42,6 +46,7 @@ Use `Authorization: Bearer <access_token>` for protected endpoints.
     ```
 
 ### 2) Patients (Authenticated)
+
 - `POST /api/patients/`
 - `GET /api/patients/`
 - `GET /api/patients/<id>/`
@@ -49,6 +54,7 @@ Use `Authorization: Bearer <access_token>` for protected endpoints.
 - `DELETE /api/patients/<id>/`
 
 Patient body fields:
+
 ```json
 {
   "name": "Alice",
@@ -61,6 +67,7 @@ Patient body fields:
 ```
 
 ### 3) Doctors (Authenticated)
+
 - `POST /api/doctors/`
 - `GET /api/doctors/`
 - `GET /api/doctors/<id>/`
@@ -68,6 +75,7 @@ Patient body fields:
 - `DELETE /api/doctors/<id>/`
 
 Doctor body fields:
+
 ```json
 {
   "name": "Dr. Smith",
@@ -80,6 +88,7 @@ Doctor body fields:
 ```
 
 ### 4) Patient-Doctor Mapping (Authenticated)
+
 - `POST /api/mappings/`
   - body:
     ```json
@@ -95,12 +104,14 @@ Doctor body fields:
 Note: `GET /api/mappings/<patient_id>/` and `DELETE /api/mappings/<id>/` share the same path pattern and differ by HTTP method.
 
 ## Validation and Error Handling
+
 - Serializer-based validation for request payloads
 - Password validation using Django password validators
 - Ownership validation for patient and mapping operations
 - Proper HTTP status codes and DRF validation responses
 
 ## Security
+
 - JWT-based authentication
 - Environment variables for sensitive settings
 - PostgreSQL used as persistent database
