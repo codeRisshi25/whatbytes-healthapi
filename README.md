@@ -120,3 +120,16 @@ Note: `GET /api/mappings/<patient_id>/` and `DELETE /api/mappings/<id>/` share t
 - JWT-based authentication
 - Environment variables for sensitive settings
 - PostgreSQL used as persistent database
+
+## Deploy to Azure
+
+This repo includes a GitHub Actions workflow to build and push the container to Azure Container Registry and update an Azure Web App for Containers.
+
+Required GitHub secrets:
+- `AZURE_CREDENTIALS` — service principal JSON for `azure/login` action
+- `ACR_NAME` — your Azure Container Registry name (no suffix)
+- `IMAGE_NAME` — image repository name (e.g., `whatbytes-web`)
+- `AZURE_RESOURCE_GROUP` — Azure resource group for the Web App
+- `AZURE_WEBAPP_NAME` — Web App name
+
+Workflow: `.github/workflows/azure-container-deploy.yml` pushes `latest` tag to ACR and updates the Web App to use it. The container runs migrations at startup via `entrypoint.sh`.
