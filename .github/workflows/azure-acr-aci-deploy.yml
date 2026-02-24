@@ -1,0 +1,72 @@
+name: Build and Deploy to ACR + ACI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy-aci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: ACR login
+        run: az acr login --name ${{ secrets.ACR_NAME }}
+
+      - name: Build and push image to ACR
+        env:
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+        run: |
+          docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:latest .
+          docker push $ACR_NAME.azurecr.io/$IMAGE_NAME:latest
+
+      - name: Get ACR credentials
+        id: acrcreds
+        run: |
+          CREDS=$(az acr credential show -n ${{ secrets.ACR_NAME }} -o json)
+          echo "ACR_USERNAME=$(echo $CREDS | jq -r .username)" >> $GITHUB_OUTPUT
+          # pick the first password
+          echo "ACR_PASSWORD=$(echo $CREDS | jq -r .passwords[0].value)" >> $GITHUB_OUTPUT
+
+      - name: Deploy or update Azure Container Instance
+        env:
+          RG: ${{ secrets.AZURE_RESOURCE_GROUP }}
+          ACI_NAME: ${{ secrets.ACI_NAME }}
+          ACR_NAME: ${{ secrets.ACR_NAME }}
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
+          ACI_DNS: ${{ secrets.ACI_DNS_NAME }}
+          ACR_USERNAME: ${{ steps.acrcreds.outputs.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ steps.acrcreds.outputs.ACR_PASSWORD }}
+        run: |
+          ACR_LOGIN=${ACR_NAME}.azurecr.io
+          IMAGE=${ACR_LOGIN}/${IMAGE_NAME}:latest
+
+          # delete existing container instance if exists
+          set +e
+          az container show -g $RG -n $ACI_NAME > /dev/null 2>&1
+          if [ $? -eq 0 ]; then
+            az container delete -g $RG -n $ACI_NAME --yes
+          fi
+          set -e
+
+          az container create \
+            --resource-group $RG \
+            --name $ACI_NAME \
+            --image $IMAGE \
+            --dns-name-label $ACI_DNS \
+            --ports 8000 \
+            --registry-login-server $ACR_LOGIN \
+            --registry-username $ACR_USERNAME \
+            --registry-password "$ACR_PASSWORD" \
+            --environment-variables \
+              SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+              DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+              DEBUG="False" \
+              ALLOWED_HOSTS="${{ secrets.ALLOWED_HOSTS }}"
